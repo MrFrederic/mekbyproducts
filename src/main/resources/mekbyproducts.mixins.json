@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.cfa.mekbyproducts.mixin",
+  "plugin": "com.cfa.mekbyproducts.mixin.MekByproductsMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ElectricMachineAccessor",
+    "FactoryAccessor",
+    "FactoryContainerMixin",
+    "MekanismTileEntityTypesMixin",
+    "extras.ExtraFactoryAccessor",
+    "extras.ExtraFactoryContainerMixin",
+    "extras.ExtraTileEntityTypesMixin"
+  ],
+  "client": [
+    "client.GuiFactoryMixin",
+    "extras.client.GuiExtraFactoryMixin",
+    "jei.CrushingCategoryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

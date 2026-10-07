@@ -1,0 +1,34 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "MIT"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "Mekanism Byproducts"
+authors = "MrFrederic"
+description = '''Gives Mekanism's Crusher and crushing factories (including Mekanism Extras tiers) chance-based byproducts.'''
+
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.194,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "mekanism"
+type = "required"
+versionRange = "[10.7.19,10.8)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "mekanism_extras"
+type = "optional"
+versionRange = "[1.4.1,)"
+ordering = "AFTER"
+side = "BOTH"

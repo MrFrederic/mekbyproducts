@@ -1,0 +1,102 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.118'
+}
+
+group = 'com.cfa.mekbyproducts'
+version = "${minecraft_version}-${mod_version}"
+base.archivesName = mod_id
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    flatDir { dir 'libs' }
+    maven { url = 'https://modmaven.dev' }           // Mekanism
+    maven { url = 'https://maven.blamejared.com' }   // JEI
+}
+
+neoForge {
+    version = neo_version
+    parchment {
+        minecraftVersion = minecraft_version
+        mappingsVersion = parchment_version
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+            sourceSet(sourceSets.test)
+        }
+    }
+    unitTest {
+        enable()
+        testedMod = mods."${mod_id}"
+    }
+    runs {
+        client {
+            client()
+            gameDirectory = file('run/client')
+        }
+        server {
+            server()
+            gameDirectory = file('run/server')
+            programArgument '--nogui'
+        }
+        // Dev-only screenshot tour of the replaced GUIs + JEI page: ./gradlew runClientShots [-PwithExtras]
+        clientShots {
+            client()
+            sourceSet = sourceSets.test
+            gameDirectory = file('run/client')
+            systemProperty 'mekbyproducts.devshots', 'true'
+            programArguments.addAll('--quickPlaySingleplayer', 'devshots')
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            sourceSet = sourceSets.test
+            gameDirectory = file('run/gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+        }
+    }
+}
+
+configurations {
+    localRuntime
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    compileOnly "mekanism:Mekanism:${mekanism_version}"
+    localRuntime "mekanism:Mekanism:${mekanism_version}"
+
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+    // Optional: Mekanism Extras (no public maven). Jar lives in libs/.
+    compileOnly name: 'mekanism_extras-1.21.1-1.4.1'
+    testCompileOnly name: 'mekanism_extras-1.21.1-1.4.1'
+    if (project.hasProperty('withExtras')) {
+        localRuntime name: 'mekanism_extras-1.21.1-1.4.1'
+        testRuntimeOnly name: 'mekanism_extras-1.21.1-1.4.1'
+    }
+
+    testImplementation "mekanism:Mekanism:${mekanism_version}"
+    testCompileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+    testCompileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    testRuntimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+processResources {
+    def props = [mod_id: mod_id, mod_version: mod_version]
+    inputs.properties props
+    filesMatching('META-INF/neoforge.mods.toml') { expand props }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
